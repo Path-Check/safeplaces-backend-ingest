@@ -3,6 +3,27 @@ const cases = require('../../../db/models/cases');
 const trails = require('../../../db/models/trails');
 
 /**
+ * @method checkValid
+ *
+ * Checks if a given access token is valid for use in consent and upload requests.
+ *
+ */
+exports.checkValid = async (req, res) => {
+  const { accessCode: codeId } = req.body;
+
+  if (codeId == null ) {
+    res.status(400).send();
+    return;
+  }
+
+  const code = await accessCodes.findById(codeId);
+
+  res.status(200).send({
+    valid: (code && code.valid)
+  });
+};
+
+/**
  * @method consent
  *
  * Sets consent status for the case associated with provided access token.

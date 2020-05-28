@@ -24,77 +24,77 @@ describe('POST /upload', () => {
   let currentCase, currentAccessCode;
 
   beforeEach(async () => {
-    await mockData.clearMockData()
+    await mockData.clearMockData();
 
     currentCase = await mockData.mockCase();
     currentAccessCode = await mockData.mockAccessCode(currentCase.id);
   });
 
   it('should fail when request is malformed', async () => {
-    let results = await chai
+    let result = await chai
       .request(server.app)
       .post('/upload')
       .send({
         accessCode: currentAccessCode.id,
       });
-    results.should.have.status(400);
+    result.should.have.status(400);
 
-    results = await chai
+    result = await chai
       .request(server.app)
       .post('/upload')
       .send({
         concernPoints: points,
       });
-    results.should.have.status(400);
+    result.should.have.status(400);
   });
 
   it('should fail when access code does not exist', async () => {
-    const results = await chai
+    const result = await chai
       .request(server.app)
       .post('/upload')
       .send({
         accessCode: "fake_code",
         concernPoints: points,
       });
-    results.should.have.status(403);
+    result.should.have.status(403);
   });
 
   it('should fail when access code is invalid', async () => {
     await accessCodes.invalidate(currentAccessCode);
-    const results = await chai
+    const result = await chai
       .request(server.app)
       .post('/upload')
       .send({
         accessCode: currentAccessCode.id,
         concernPoints: points,
       });
-    results.should.have.status(403);
+    result.should.have.status(403);
   });
 
   it('should fail without consent', async () => {
     chai.should().not.exist(currentCase.consent);
 
-    const results = await chai
+    const result = await chai
       .request(server.app)
       .post('/upload')
       .send({
         accessCode: currentAccessCode.id,
         concernPoints: points,
       });
-    results.should.have.status(403);
+    result.should.have.status(403);
   });
 
   it('should create trails', async () => {
     await cases.updateConsent(currentCase.id, true);
 
-    const results = await chai
+    const result = await chai
       .request(server.app)
       .post('/upload')
       .send({
         accessCode: currentAccessCode.id,
         concernPoints: points,
       });
-    results.should.have.status(201);
+    result.should.have.status(201);
 
     const allTrail = await trails.find({ case_id: currentCase.id });
     allTrail.length.should.equal(points.length);
@@ -103,14 +103,14 @@ describe('POST /upload', () => {
   it('should invalidate access code', async () => {
     await cases.updateConsent(currentCase.id, true);
 
-    const results = await chai
+    const result = await chai
       .request(server.app)
       .post('/upload')
       .send({
         accessCode: currentAccessCode.id,
         concernPoints: points,
       });
-    results.should.have.status(201);
+    result.should.have.status(201);
 
     currentAccessCode = await accessCodes.findById(currentAccessCode.id);
     currentAccessCode.valid.should.be.false;
