@@ -1,4 +1,4 @@
-const accessCodes = require('../../../db/models/access_codes');
+const accessCodes = require('../../../db/models/accessCodes');
 const cases = require('../../../db/models/cases');
 const trails = require('../../../db/models/trails');
 
@@ -28,6 +28,7 @@ exports.consent = async (req, res) => {
   const associatedCase = await cases.findById(code.case_id);
 
   // Check existence of case associated with the access code
+  // (due to FKs this shouldn't happen in practice)
   if (!associatedCase) {
     res.status(404).send();
     return;
@@ -69,6 +70,7 @@ exports.upload = async (req, res) => {
   const associatedCase = await cases.findById(code.case_id);
 
   // Check existence of case associated with the access code
+  // (due to FKs this shouldn't happen in practice)
   if (!associatedCase) {
     res.status(404).send();
     return;

@@ -9,7 +9,7 @@ class Service extends BaseService {
 
   async insertPoints(points, caseId) {
     if (!points) throw new Error('Points are invalid');
-    if (!caseId) throw new Error('Case ID is invalid');
+    if (caseId == null) throw new Error('Case ID is invalid');
 
     const pointRecords = [];
 
