@@ -3,7 +3,7 @@ const { onUpdateTrigger } = require('../../knexfile');
 exports.up = function(knex) {
   return knex.schema.createTable('trails', function (table) {
     table.increments('id').notNull().primary();
-    table.uuid('case_id').notNull().references('cases.id').onDelete('CASCADE');
+    table.integer('case_id').unsigned().references('cases.id').onDelete('CASCADE');
     table.specificType('coordinates', 'geometry(point, 4326)');
     table.timestamp('time');
     table.string('hash');

@@ -1,5 +1,3 @@
-const { v4: uuidv4 } = require('uuid');
-
 const accessCodes = require('../../db/models/accessCodes');
 const cases = require('../../db/models/cases');
 const trails = require('../../db/models/trails');
@@ -24,7 +22,7 @@ class MockData {
    */
   async mockCase() {
     const params = {
-      id: uuidv4(),
+      id: 1,
     };
 
     await cases.create(params);
