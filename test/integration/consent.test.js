@@ -74,7 +74,7 @@ describe('POST /consent', () => {
     result.should.have.status(200);
 
     currentCase = await cases.findById(currentCase.id);
-    currentCase.consent.should.be.true;
+    currentCase.consent_tos.should.be.true;
   });
 
   it('should update consent and invalidate access code when consent is false', async () => {
@@ -88,7 +88,7 @@ describe('POST /consent', () => {
     result.should.have.status(200);
 
     currentCase = await cases.findById(currentCase.id);
-    currentCase.consent.should.be.false;
+    currentCase.consent_tos.should.be.false;
 
     currentAccessCode = await accessCodes.findById(currentAccessCode.id);
     currentAccessCode.valid.should.be.false;

@@ -72,7 +72,7 @@ describe('POST /upload', () => {
   });
 
   it('should fail without consent', async () => {
-    chai.should().not.exist(currentCase.consent);
+    chai.should().not.exist(currentCase.consent_tos);
 
     const result = await chai
       .request(server.app)
@@ -85,7 +85,7 @@ describe('POST /upload', () => {
   });
 
   it('should create trails', async () => {
-    await cases.updateConsent(currentCase.id, true);
+    await cases.updateTermsConsent(currentCase.id, true);
 
     const result = await chai
       .request(server.app)
@@ -101,7 +101,7 @@ describe('POST /upload', () => {
   });
 
   it('should invalidate access code', async () => {
-    await cases.updateConsent(currentCase.id, true);
+    await cases.updateTermsConsent(currentCase.id, true);
 
     const result = await chai
       .request(server.app)

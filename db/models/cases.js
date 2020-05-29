@@ -7,11 +7,11 @@ class Service extends BaseService {
     return this.findOne({ id: id });
   }
 
-  async updateConsent(id, consent) {
+  async updateTermsConsent(id, consent) {
     if (id == null || consent == null) throw new Error('Filter was not provided');
 
     return await this.updateOne(id, {
-      consent: consent,
+      consent_tos: consent,
     });
   }
 

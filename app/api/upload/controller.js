@@ -55,7 +55,7 @@ exports.consent = async (req, res) => {
     return;
   }
 
-  await cases.updateConsent(associatedCase.id, consent);
+  await cases.updateTermsConsent(associatedCase.id, consent);
 
   // If consent isn't granted, access code can no longer be used
   if (!consent) {
@@ -98,7 +98,7 @@ exports.upload = async (req, res) => {
   }
 
   // If consent isn't granted, then forbid upload
-  if (!associatedCase.consent) {
+  if (!associatedCase.consent_tos) {
     res.status(403).send();
     return;
   }
