@@ -7,24 +7,26 @@ const st = knexPostgis(knex);
 
 class Service extends BaseService {
 
-  async insertPoints(points, caseId) {
+  async createMany(points, accessCode, uploadId) {
     if (!points) throw new Error('Points are invalid');
-    if (caseId == null) throw new Error('Case ID is invalid');
+    if (!accessCode || !accessCode.id) throw new Error('Access code is invalid');
+    if (!uploadId) throw new Error('Upload ID is invalid');
 
     const pointRecords = [];
 
     for(let point of points) {
-      let record = {};
-      let hash = await geoHash.encrypt(point);
+      const record = {};
+      const hash = await geoHash.encrypt(point);
 
       if (hash) {
+        record.access_code_id = accessCode.id;
+        record.upload_id = uploadId;
         record.hash = hash.encodedString;
         record.coordinates = st.setSRID(
           st.makePoint(point.longitude, point.latitude),
           4326
         );
         record.time = new Date(point.time * 1000); // Assumes time in epoch seconds
-        record.case_id = caseId;
         pointRecords.push(record);
       }
     }
@@ -34,4 +36,4 @@ class Service extends BaseService {
 
 }
 
-module.exports = new Service('trails');
+module.exports = new Service('points');

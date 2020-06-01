@@ -1,7 +1,8 @@
 exports.up = function(knex) {
   return knex.schema.createTable('access_codes', function (table) {
-    table.string('id', 6).primary();
-    table.integer('case_id').unsigned().unique().references('cases.id').onDelete('CASCADE');
+    table.increments('id').notNull().primary();
+    table.string('value', 6).notNullable().unique();
+    table.boolean('upload_consent').nullable();
     table.timestamp('invalidated_at').nullable();
     table.timestamp('created_at').defaultTo(knex.fn.now());
   });

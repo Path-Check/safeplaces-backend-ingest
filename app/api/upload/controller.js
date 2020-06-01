@@ -1,6 +1,7 @@
+const { v4: uuidv4 } = require('uuid');
+
 const accessCodes = require('../../../db/models/accessCodes');
-const cases = require('../../../db/models/cases');
-const trails = require('../../../db/models/trails');
+const points = require('../../../db/models/points');
 
 /**
  * @method checkValid
@@ -9,14 +10,14 @@ const trails = require('../../../db/models/trails');
  *
  */
 exports.checkValid = async (req, res) => {
-  const { accessCode: codeId } = req.body;
+  const { accessCode: codeValue } = req.body;
 
-  if (codeId == null ) {
+  if (codeValue == null ) {
     res.status(400).send();
     return;
   }
 
-  const code = await accessCodes.findById(codeId);
+  const code = await accessCodes.find({ value: codeValue });
 
   res.status(200).send({
     valid: (code && code.valid)
@@ -31,14 +32,14 @@ exports.checkValid = async (req, res) => {
  *
  */
 exports.consent = async (req, res) => {
-  const { accessCode: codeId, consent } = req.body;
+  const { accessCode: codeValue, consent } = req.body;
 
-  if (codeId == null || consent == null ) {
+  if (codeValue == null || consent == null ) {
     res.status(400).send();
     return;
   }
 
-  const code = await accessCodes.findById(codeId);
+  const code = await accessCodes.find({ value: codeValue });
 
   // Check validity of access code
   if (!code || !code.valid) {
@@ -46,16 +47,7 @@ exports.consent = async (req, res) => {
     return;
   }
 
-  const associatedCase = await cases.findById(code.case_id);
-
-  // Check existence of case associated with the access code
-  // (due to FKs this shouldn't happen in practice)
-  if (!associatedCase) {
-    res.status(404).send();
-    return;
-  }
-
-  await cases.updateTermsConsent(associatedCase.id, consent);
+  await accessCodes.updateUploadConsent(code, consent);
 
   // If consent isn't granted, access code can no longer be used
   if (!consent) {
@@ -73,14 +65,14 @@ exports.consent = async (req, res) => {
  *
  */
 exports.upload = async (req, res) => {
-  const { accessCode: codeId, concernPoints: points } = req.body;
+  const { accessCode: codeValue, concernPoints: uploadedPoints } = req.body;
 
-  if (codeId == null || !points) {
+  if (codeValue == null || uploadedPoints == null) {
     res.status(400).send();
     return;
   }
 
-  const code = await accessCodes.findById(codeId);
+  const code = await accessCodes.find({ value: codeValue });
 
   // Check validity of access code
   if (!code || !code.valid) {
@@ -88,25 +80,20 @@ exports.upload = async (req, res) => {
     return;
   }
 
-  const associatedCase = await cases.findById(code.case_id);
-
-  // Check existence of case associated with the access code
-  // (due to FKs this shouldn't happen in practice)
-  if (!associatedCase) {
-    res.status(404).send();
-    return;
-  }
-
   // If consent isn't granted, then forbid upload
-  if (!associatedCase.consent_tos) {
-    res.status(403).send();
+  if (!code.upload_consent) {
+    res.status(451).send();
     return;
   }
 
-  await trails.insertPoints(points, associatedCase.id);
+  const uploadId = uuidv4();
+
+  await points.createMany(uploadedPoints, code, uploadId);
 
   // Access code is one-time use
   await accessCodes.invalidate(code);
 
-  res.status(201).send();
+  res.status(201).send({
+    uploadId: uploadId,
+  });
 };

@@ -1,6 +1,5 @@
 const accessCodes = require('../../db/models/accessCodes');
-const cases = require('../../db/models/cases');
-const trails = require('../../db/models/trails');
+const points = require('../../db/models/points');
 
 class MockData {
 
@@ -11,23 +10,7 @@ class MockData {
    */
   async clearMockData() {
     await accessCodes.deleteAllRows();
-    await cases.deleteAllRows();
-    await trails.deleteAllRows();
-  }
-
-  /**
-   * @method mockCase
-   *
-   * Generates a new mock case.
-   */
-  async mockCase() {
-    const params = {
-      id: 1,
-    };
-
-    await cases.create(params);
-
-    return cases.findById(params.id);
+    await points.deleteAllRows();
   }
 
   /**
@@ -35,17 +18,14 @@ class MockData {
    *
    * Generates a new mock access code.
    */
-  async mockAccessCode(caseId) {
-    if (caseId == null) throw new Error('Case must be provided');
-
+  async mockAccessCode() {
     const params = {
-      id: "123456",
-      case_id: caseId,
+      value: "123456",
     };
 
     await accessCodes.create(params);
 
-    return await accessCodes.findById(params.id);
+    return await accessCodes.find({ value: params.value });
   }
 
 }

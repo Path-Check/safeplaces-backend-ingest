@@ -8,18 +8,15 @@ const mockData = require('../lib/mockData');
 const server = require('../../app');
 
 const accessCodes = require('../../db/models/accessCodes');
-const cases = require('../../db/models/cases');
 
 chai.use(chaiHttp);
 
 describe('POST /consent', () => {
-  let currentCase, currentAccessCode;
+  let currentAccessCode;
 
   beforeEach(async () => {
     await mockData.clearMockData();
-
-    currentCase = await mockData.mockCase();
-    currentAccessCode = await mockData.mockAccessCode(currentCase.id);
+    currentAccessCode = await mockData.mockAccessCode();
   });
 
   it('should fail when request is malformed', async () => {
@@ -27,7 +24,7 @@ describe('POST /consent', () => {
       .request(server.app)
       .post('/consent')
       .send({
-        accessCode: currentAccessCode.id,
+        accessCode: currentAccessCode.value,
       });
     result.should.have.status(400);
 
@@ -57,7 +54,7 @@ describe('POST /consent', () => {
       .request(server.app)
       .post('/consent')
       .send({
-        accessCode: currentAccessCode.id,
+        accessCode: currentAccessCode.value,
         consent: true,
       });
     result.should.have.status(403);
@@ -68,13 +65,13 @@ describe('POST /consent', () => {
       .request(server.app)
       .post('/consent')
       .send({
-        accessCode: currentAccessCode.id,
+        accessCode: currentAccessCode.value,
         consent: true,
       });
     result.should.have.status(200);
 
-    currentCase = await cases.findById(currentCase.id);
-    currentCase.consent_tos.should.be.true;
+    currentAccessCode = await accessCodes.find({ id: currentAccessCode.id });
+    currentAccessCode.upload_consent.should.be.true;
   });
 
   it('should update consent and invalidate access code when consent is false', async () => {
@@ -82,15 +79,12 @@ describe('POST /consent', () => {
       .request(server.app)
       .post('/consent')
       .send({
-        accessCode: currentAccessCode.id,
+        accessCode: currentAccessCode.value,
         consent: false,
       });
     result.should.have.status(200);
 
-    currentCase = await cases.findById(currentCase.id);
-    currentCase.consent_tos.should.be.false;
-
-    currentAccessCode = await accessCodes.findById(currentAccessCode.id);
-    currentAccessCode.valid.should.be.false;
+    currentAccessCode = await accessCodes.find({ id: currentAccessCode.id });
+    currentAccessCode.upload_consent.should.be.false;
   });
 });

@@ -3,8 +3,7 @@ exports.seed = function (knex) {
     .del()
     .then(async function () {
       return knex('access_codes').insert({
-        id: '123456',
-        case_id: '1',
+        value: '123456',
       });
     });
 };

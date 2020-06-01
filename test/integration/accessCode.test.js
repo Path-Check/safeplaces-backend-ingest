@@ -1,6 +1,5 @@
 process.env.NODE_ENV = 'test';
-process.env.DB_NAME =
-process.env.DB_NAME || 'safeplaces_ingest_test';
+process.env.DB_NAME = (process.env.DB_NAME || 'safeplaces_ingest_test');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -16,9 +15,7 @@ describe('GET /access-code/valid', () => {
 
   beforeEach(async () => {
     await mockData.clearMockData();
-
-    const currentCase = await mockData.mockCase();
-    currentAccessCode = await mockData.mockAccessCode(currentCase.id);
+    currentAccessCode = await mockData.mockAccessCode();
   });
 
   it('should fail when request is malformed', async () => {
@@ -34,7 +31,7 @@ describe('GET /access-code/valid', () => {
       .request(server.app)
       .get('/access-code/valid')
       .send({
-        accessCode: currentAccessCode.id,
+        accessCode: currentAccessCode.value,
       });
     result.should.have.status(200);
     result.body.valid.should.be.true;
@@ -47,7 +44,7 @@ describe('GET /access-code/valid', () => {
       .request(server.app)
       .get('/access-code/valid')
       .send({
-        accessCode: currentAccessCode.id,
+        accessCode: currentAccessCode.value,
       });
     result.should.have.status(200);
     result.body.valid.should.be.false;

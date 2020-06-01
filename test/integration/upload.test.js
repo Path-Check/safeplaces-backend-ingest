@@ -8,26 +8,23 @@ const mockData = require('../lib/mockData');
 const server = require('../../app');
 
 const accessCodes = require('../../db/models/accessCodes');
-const cases = require('../../db/models/cases');
-const trails = require('../../db/models/trails');
+const points = require('../../db/models/points');
 
 chai.use(chaiHttp);
 
 describe('POST /upload', () => {
-  const points = [{
+  const uploadPoints = [{
     longitude: 14.91328448,
     latitude: 41.24060321,
     time: 1589117739000,
     hash: "87e916850d4def3c",
   }];
 
-  let currentCase, currentAccessCode;
+  let currentAccessCode;
 
   beforeEach(async () => {
     await mockData.clearMockData();
-
-    currentCase = await mockData.mockCase();
-    currentAccessCode = await mockData.mockAccessCode(currentCase.id);
+    currentAccessCode = await mockData.mockAccessCode();
   });
 
   it('should fail when request is malformed', async () => {
@@ -35,7 +32,7 @@ describe('POST /upload', () => {
       .request(server.app)
       .post('/upload')
       .send({
-        accessCode: currentAccessCode.id,
+        accessCode: currentAccessCode.value,
       });
     result.should.have.status(400);
 
@@ -43,7 +40,7 @@ describe('POST /upload', () => {
       .request(server.app)
       .post('/upload')
       .send({
-        concernPoints: points,
+        concernPoints: uploadPoints,
       });
     result.should.have.status(400);
   });
@@ -54,7 +51,7 @@ describe('POST /upload', () => {
       .post('/upload')
       .send({
         accessCode: "fake_code",
-        concernPoints: points,
+        concernPoints: uploadPoints,
       });
     result.should.have.status(403);
   });
@@ -65,54 +62,43 @@ describe('POST /upload', () => {
       .request(server.app)
       .post('/upload')
       .send({
-        accessCode: currentAccessCode.id,
-        concernPoints: points,
+        accessCode: currentAccessCode.value,
+        concernPoints: uploadPoints,
       });
     result.should.have.status(403);
   });
 
   it('should fail without consent', async () => {
-    chai.should().not.exist(currentCase.consent_tos);
+    chai.should().not.exist(currentAccessCode.upload_consent);
 
     const result = await chai
       .request(server.app)
       .post('/upload')
       .send({
-        accessCode: currentAccessCode.id,
-        concernPoints: points,
+        accessCode: currentAccessCode.value,
+        concernPoints: uploadPoints,
       });
-    result.should.have.status(403);
+    result.should.have.status(451);
   });
 
-  it('should create trails', async () => {
-    await cases.updateTermsConsent(currentCase.id, true);
+  it('should create points and invalidate access code', async () => {
+    await accessCodes.updateUploadConsent(currentAccessCode, true);
+    currentAccessCode.upload_consent.should.be.true;
 
     const result = await chai
       .request(server.app)
       .post('/upload')
       .send({
-        accessCode: currentAccessCode.id,
-        concernPoints: points,
+        accessCode: currentAccessCode.value,
+        concernPoints: uploadPoints,
       });
     result.should.have.status(201);
+    chai.should().exist(result.body.uploadId);
 
-    const allTrail = await trails.find({ case_id: currentCase.id });
-    allTrail.length.should.equal(points.length);
-  });
+    const uploadedPoints = await points.find({ access_code_id: currentAccessCode.id });
+    uploadedPoints.length.should.equal(uploadPoints.length);
 
-  it('should invalidate access code', async () => {
-    await cases.updateTermsConsent(currentCase.id, true);
-
-    const result = await chai
-      .request(server.app)
-      .post('/upload')
-      .send({
-        accessCode: currentAccessCode.id,
-        concernPoints: points,
-      });
-    result.should.have.status(201);
-
-    currentAccessCode = await accessCodes.findById(currentAccessCode.id);
+    currentAccessCode = await accessCodes.find({ id: currentAccessCode.id });
     currentAccessCode.valid.should.be.false;
   });
 });
