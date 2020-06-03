@@ -13,10 +13,9 @@ name: Deploy SafePlaces ExpressJS to GKE
 on:
   push:
     branches:
-      - dev-mvp
-      - feature/docker-compose-corrections
-    paths:
-      - 'expressjs/**/**'
+      - dev
+      - PLACES-243
+
 
 # Environment variables available to all jobs and steps in this workflow
 env:
@@ -25,7 +24,7 @@ env:
   GITHUB_SHA: ${{ github.sha }}
   GKE_ZONE: ${{ secrets.GKE_ZONE }}
   GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
-  IMAGE: safeplaces-be-express
+  IMAGE: safeplaces-be-express-ingest
   REGISTRY_HOSTNAME: gcr.io
   DEPLOYMENT_NAME: ${{ secrets.XP_DEPLOYMENT_NAME }}
   CONTAINER_NAME: ${{ secrets.XP_CONTAINER_NAME }}
@@ -38,7 +37,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: expressjs
+        # working-directory: expressjs
     steps:
 
     - name: Checkout

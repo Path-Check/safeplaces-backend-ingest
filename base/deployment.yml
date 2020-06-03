@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spp-be-express
+  name: spp-be-ingest
   labels:
-    app: spp-be-express
+    app: spp-be-ingest
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: spp-be-express
+      app: spp-be-ingest
   template:
     metadata:
       labels:
-        app: spp-be-express
+        app: spp-be-ingest
     spec:
       containers:
-        - name: spp-be-express
+        - name: spp-be-ingest
           image: gcr.io/PROJECT_ID/IMAGE:TAG
           imagePullPolicy: IfNotPresent
           env:
@@ -23,7 +23,7 @@ spec:
             value: "3000"
           envFrom:
             - secretRef:
-                name: expressapp
+                name: splingest
           ports:
             - name: express
               containerPort: 3000
@@ -31,12 +31,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: express
+              port: ingest
             initialDelaySeconds: 20
             periodSeconds: 3
           readinessProbe:
             httpGet:
               path: /health
-              port: express
+              port: ingest
             initialDelaySeconds: 30
             periodSeconds: 2
