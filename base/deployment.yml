@@ -25,7 +25,7 @@ spec:
             - secretRef:
                 name: splingest
           ports:
-            - name: express
+            - name: ingest
               containerPort: 3000
               protocol: TCP
           livenessProbe:
