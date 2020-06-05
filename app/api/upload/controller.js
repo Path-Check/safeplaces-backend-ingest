@@ -20,7 +20,7 @@ exports.checkValid = async (req, res) => {
   const code = await accessCodes.find({ value: codeValue });
 
   res.status(200).send({
-    valid: (code && code.valid)
+    valid: (code != null && code.valid)
   });
 };
 
