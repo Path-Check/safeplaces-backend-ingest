@@ -10,7 +10,7 @@ const accessCodes = require('../../db/models/accessCodes');
 
 chai.use(chaiHttp);
 
-describe('GET /access-code/valid', () => {
+describe('POST /access-code/valid', () => {
   let currentAccessCode;
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('GET /access-code/valid', () => {
   it('should fail when request is malformed', async () => {
     let result = await chai
       .request(server.app)
-      .get('/access-code/valid')
+      .post('/access-code/valid')
       .send();
     result.should.have.status(400);
   });
@@ -29,7 +29,7 @@ describe('GET /access-code/valid', () => {
   it('should succeed when code is valid', async () => {
     const result = await chai
       .request(server.app)
-      .get('/access-code/valid')
+      .post('/access-code/valid')
       .send({
         accessCode: currentAccessCode.value,
       });
@@ -43,7 +43,7 @@ describe('GET /access-code/valid', () => {
 
     const result = await chai
       .request(server.app)
-      .get('/access-code/valid')
+      .post('/access-code/valid')
       .send({
         accessCode: currentAccessCode.value,
       });
@@ -55,7 +55,7 @@ describe('GET /access-code/valid', () => {
   it('should succeed when code does not exist', async () => {
     const result = await chai
       .request(server.app)
-      .get('/access-code/valid')
+      .post('/access-code/valid')
       .send({
         accessCode: "fake_code",
       });

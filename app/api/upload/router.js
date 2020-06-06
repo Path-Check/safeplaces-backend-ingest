@@ -1,7 +1,7 @@
 const server = require('../../../src/server');
 const controller = require('./controller');
 
-server.get(
+server.post(
   '/access-code/valid',
   server.wrapAsync(
     async (req, res) => await controller.checkValid(req, res),
