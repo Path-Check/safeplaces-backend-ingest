@@ -1,6 +1,5 @@
 process.env.NODE_ENV = 'test';
-process.env.DATABASE_URL =
-  process.env.DATABASE_URL || 'postgres://localhost/safeplaces_test';
+process.env.DB_NAME = (process.env.DB_NAME || 'safeplaces_ingest_test');
 
 var chai = require('chai');
 var should = chai.should(); // eslint-disable-line
