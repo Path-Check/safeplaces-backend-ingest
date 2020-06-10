@@ -12,7 +12,7 @@ const points = require('../../../db/models/points');
 exports.checkValid = async (req, res) => {
   const { accessCode: codeValue } = req.body;
 
-  if (codeValue == null ) {
+  if (codeValue == null) {
     res.status(400).send();
     return;
   }
@@ -34,7 +34,7 @@ exports.checkValid = async (req, res) => {
 exports.consent = async (req, res) => {
   const { accessCode: codeValue, consent } = req.body;
 
-  if (codeValue == null || consent == null ) {
+  if (codeValue == null || consent == null) {
     res.status(400).send();
     return;
   }

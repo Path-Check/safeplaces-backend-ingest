@@ -1,6 +1,5 @@
 process.env.NODE_ENV = 'test';
-process.env.DB_NAME =
-process.env.DB_NAME || 'safeplaces_ingest_test';
+process.env.DB_NAME = (process.env.DB_NAME || 'safeplaces_ingest_test');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
