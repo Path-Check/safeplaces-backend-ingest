@@ -35,7 +35,7 @@ class PublicationFiles {
         publish_date_utc: (record.publish_date.getTime() / 1000),
         info_website_url: organization.info_website_url,
         notification_threshold_percent: organization.notification_threshold_percent,
-        notification_threshold_count: organization.notification_threshold_count,
+        notification_threshold_timeframe: organization.notification_threshold_timeframe,
         concern_point_hashes: this._getPointHashes(chunk),
         page_name: this._apiEndpointPage.replace('[PAGE]', `${chunk.startTimestamp}_${chunk.endTimestamp}`)
       };

@@ -1,58 +1,64 @@
-// // const _ = require('lodash')
-// const { v4: uuidv4 } = require('uuid');
-// const bcrypt = require('bcrypt');
+const accessCodes = require('../../db/models/accessCodes');
+const organizations = require('../../db/models/organizations');
+const points = require('../../db/models/points');
 
-// class MockData {
+class MockData {
 
-//   /**
-//    * @method clearMockData
-//    *
-//    * Clear out Mock Data
-//    */
-//   async clearMockData() {
-//     // await organizationService.deleteAllRows()
-//     // await settingsService.deleteAllRows()
-//     // await usersService.deleteAllRows()
-//     // await trailsService.deleteAllRows()
-//     // await publicationService.deleteAllRows()
-//     // await casesService.deleteAllRows()
-//   }
+  /**
+   * @method clearMockData
+   *
+   * Clear out Mock Data
+   */
+  async clearMockData() {
+    await accessCodes.deleteAllRows();
+    await organizations.deleteAllRows();
+    await points.deleteAllRows();
+  }
 
-//   /**
-//    * @method mockUser
-//    *
-//    * Generate Mock User
-//    */
-//   async mockUser(options = {}) {
-//     if (!options.username) throw new Error('Username must be provided');
-//     if (!options.password) throw new Error('Password must be provided');
-//     if (!options.organization_id) throw new Error('Organization ID must be provided');
-//     if (!options.email) throw new Error('Email must be provided');
+  /**
+   * @method mockAccessCode
+   *
+   * Generates a new mock access code.
+   */
+  async mockAccessCode() {
+    const params = {
+      value: "123456",
+    };
 
-//     if (!process.env.SEED_MAPS_API_KEY) {
-//       throw new Error('Populate environment variable SEED_MAPS_API_KEY');
-//     }
+    await accessCodes.create(params);
 
-//     const password = await bcrypt.hash(options.password, 5);
+    return await accessCodes.find({ value: params.value });
+  }
 
-//     const params = {
-//       id: uuidv4(),
-//       organization_id: options.organization_id,
-//       username: options.username,
-//       password: password,
-//       email: options.email,
-//       is_admin: true,
-//       maps_api_key: process.env.SEED_MAPS_API_KEY,
-//     };
+  /**
+   * @method mockOrganization
+   *
+   * Generates a new mock organization.
+   */
+  async mockOrganization(externalId) {
+    if (!externalId) throw new Error('External ID must be provided');
 
-//     const results = await usersService.create(params);
-//     if (results) {
-//       return results[0];
-//     }
-//     throw new Error('Problem adding the organization.');
-//   }
-// }
+    const params = {
+      id: 1,
+      external_id: externalId,
+      name: 'Mock Organization',
+      info_website_url: 'https://info.website.url',
+      reference_website_url: 'https://reference.website.url',
+      api_endpoint_url: 'https://api.endpoint.url',
+      privacy_policy_url: 'https://privacy.policy.url',
+      region_coordinates: {
+        "ne": { "latitude": 20.312764055951195, "longitude": -70.45445121262883 },
+        "sw": { "latitude": 17.766025040122642, "longitude": -75.49442923997258 },
+      },
+      notification_threshold_percent: 66,
+      notification_threshold_timeframe: 6,
+    };
 
-// module.exports = new MockData();
+    await organizations.create(params);
 
-module.exports = {};
+    return await organizations.find({ id: params.id });
+  }
+
+}
+
+module.exports = new MockData();
