@@ -23,6 +23,7 @@ describe('POST /access-code/valid', () => {
       .request(server.app)
       .post('/access-code/valid')
       .send();
+      
     result.should.have.status(400);
   });
 
