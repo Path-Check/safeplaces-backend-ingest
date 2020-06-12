@@ -51,7 +51,7 @@ class MockData {
         "sw": { "latitude": 17.766025040122642, "longitude": -75.49442923997258 },
       },
       notification_threshold_percent: 66,
-      notification_threshold_count: 6,
+      notification_threshold_timeframe: 6,
     };
 
     await organizations.create(params);

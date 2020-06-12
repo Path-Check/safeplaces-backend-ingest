@@ -46,7 +46,7 @@ describe('GET /organization/configuration', () => {
     result.body.should.be.a('object');
     result.body.name.should.equal(currentOrganization.name);
     result.body.notificationThresholdPercent.should.equal(currentOrganization.notificationThresholdPercent);
-    result.body.notificationThresholdCount.should.equal(currentOrganization.notificationThresholdCount);
+    result.body.notificationThresholdTimeframe.should.equal(currentOrganization.notificationThresholdTimeframe);
     result.body.regionCoordinates.should.be.a('object');
     result.body.apiEndpointUrl.should.equal(currentOrganization.apiEndpointUrl);
     result.body.referenceWebsiteUrl.should.equal(currentOrganization.referenceWebsiteUrl);
