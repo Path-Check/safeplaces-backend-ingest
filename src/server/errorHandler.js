@@ -1,17 +1,32 @@
+const logger = require('../logger')
 
-const logErrors = () => {
-  return (error, req, res) => {
-
-    let errorCode = error.statusCode || 500
-    let errorMessage = error.message || 'General error.'
-  
-    console.log(`${errorCode} - ${errorMessage}`)
-    if (error.stack) {
-      console.log('##### Error Stack: ', error.stack)
+/* eslint-disable */
+const errorHandler = () => {
+  return (err, req, res, next) => {
+    let errorCode = err.statusCode || 500
+    let errorMessage = err.message || 'General error.'
+    if (err.isBoom) {
+      errorCode = err.output.statusCode
+      errorMessage = err.output.payload.message
     }
-  
-    res.status(errorCode).json({ message: `${errorCode} - ${errorMessage}` })
+
+    let response = { message: `${errorCode} - ${errorMessage}` }
+    if (process.env.NODE_ENV !== 'production') {
+      response.error = err
+      if (process.env.NODE_ENV !== 'test' && err.stack) {
+        console.error('')
+        console.error(err.stack)
+        console.error('')
+      }
+    }
+    
+    if (process.env.NODE_ENV !== 'test') {
+      logger.error(`${errorCode} - ${errorMessage}`)
+    }
+
+    res.status(errorCode).json(response)
   }
 }
 
-module.exports = logErrors
+module.exports = errorHandler
+/* eslint-enable */

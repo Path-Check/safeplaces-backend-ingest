@@ -3,33 +3,29 @@ const http = require('http');
 const Promise = require('bluebird');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const errorHandler = require('./errorHandler')
-// const notFoundHandler = require('./notFoundHandler')
+const expressLogger = require('../logger/express');
+const errorHandler = require('./errorHandler');
+const notFoundHandler = require('./notFoundHandler');
+const responseTimeHandler = require('./responseTimeHandler');
 
-const createError = require('http-errors');
 const expressSession = require('express-session');
 const cookieParser = require('cookie-parser');
-// const path = require('path');
-const logger = require('morgan');
 
 class Server {
   constructor() {
     this._app = express();
 
-    // TODO: Are we really using views here?
-    // view engine setup
-    // this._app.set('views', path.join(__dirname, 'views'));
-    // this._app.set('view engine', 'jade');
-    // app.use(express.static(path.join(__dirname, 'public')));
+    const bodyParseJson = bodyParser.json({
+      type:'*/*',
+      limit: '50mb'
+    })
+    const bodyParseEncoded = bodyParser.urlencoded({ extended: false })
 
-    if (process.env.NODE_ENV !== 'test') {
-      this._app.use(logger('dev'));
-    }
     this._app.use(cors());
-    this._app.use(express.json());
-    this._app.use(express.urlencoded({ extended: false }));
     this._app.use(cookieParser());
-    this._app.use(bodyParser.urlencoded({ extended: true }));
+    this._app.use(expressLogger()); // Log Request
+    this._app.use(bodyParseJson);
+    this._app.use(bodyParseEncoded);
     this._app.use(
       expressSession({
         secret: 'keyboard cat',
@@ -38,40 +34,15 @@ class Server {
       }),
     );
 
+    this._app.use(responseTimeHandler())
+    
     this._router = express.Router();
     this._app.use('/', this._router);
 
-    this._app.use(function (req, res, next) {
-      next(createError(404));
-    }); // If we get to here then we obviously didn't find the route, so trigger error.
-    this._app.use(errorHandler()) // Catch all for errors.
-
-    // error handler
-
-    // TODO: Move error handling into module...
-    // if (
-    //   this._app.get('env') === 'development' ||
-    //   this._app.get('env') === 'test'
-    // ) {
-    //   this._app.use(function (err, req, res) {
-    //     res.status(err.status || 500);
-    //     res.json({
-    //       message: err.message,
-    //       error: err,
-    //     });
-    //   });
-    // }
-
-    // // production error handler
-    // // no stacktraces leaked to user
-    // else {
-    //   this._app.use(function (err, req, res) {
-    //     res.status(err.status || 500);
-    //     res.json({
-    //       message: err.message,
-    //     });
-    //   });
-    // }
+    process.nextTick(() => {
+      this._app.use(notFoundHandler());
+      this._app.use(errorHandler())
+    })
 
     this._server = http.createServer(this._app);
   }
@@ -84,6 +55,11 @@ class Server {
     if (!port) throw new Error('Port not set.');
 
     return Promise.fromCallback(cb => this._server.listen(port, cb));
+  }
+
+
+  close() {
+    this._server.close();
   }
 
   /**
