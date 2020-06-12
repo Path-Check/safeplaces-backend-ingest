@@ -8,7 +8,7 @@ class Service extends BaseService {
     return super.find(query).first(
       'name',
       'notification_threshold_percent AS notificationThresholdPercent',
-      'notification_threshold_count AS notificationThresholdCount',
+      'notification_threshold_timeframe AS notificationThresholdTimeframe',
       'region_coordinates AS regionCoordinates',
       'api_endpoint_url AS apiEndpointUrl',
       'reference_website_url AS referenceWebsiteUrl',
