@@ -18,6 +18,9 @@ const errorHandler = () => {
         console.error(err.stack)
         console.error('')
       }
+    } else {
+      errorMessage = 'Internal server error'
+      response = { message: `${errorCode} - ${errorMessage}` }
     }
     
     if (process.env.NODE_ENV !== 'test') {
