@@ -26,7 +26,7 @@ class Service extends BaseService {
           st.makePoint(point.longitude, point.latitude),
           4326
         );
-        record.time = new Date(point.time * 1000); // Assumes time in epoch seconds
+        record.time = new Date(point.time); // Assumes time in epoch milliseconds
         pointRecords.push(record);
       }
     }
