@@ -13,8 +13,7 @@ name: Deploy SafePlaces ExpressJS to GKE
 on:
   push:
     branches:
-      - dev
-      - PLACES-243
+      - staging
 
 
 # Environment variables available to all jobs and steps in this workflow
