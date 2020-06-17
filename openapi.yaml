@@ -1,0 +1,226 @@
+openapi: 3.0.0
+info:
+  title: SafePlaces Ingest API
+  contact: {}
+  version: '1.0'
+paths:
+  /access-code/valid:
+    post:
+      summary: Indicates whether or not an accces code is valid for use in an upload call.
+      operationId: AccessCodeValid
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessCodeValidRequest'
+            example:
+              accessCode: 272236
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessCodeValidResponse'
+      deprecated: false
+  /consent:
+    post:
+      summary: Consent
+      operationId: Consent
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentRequest'
+            example:
+              accessCode: 272236
+              consent: true
+        required: true
+      responses:
+        200:
+          description: 'Consent was stored successfully.'
+          headers: {}
+      deprecated: false
+  /upload:
+    post:
+      summary: Upload points of concern data to be redacted in contact tracing tool
+      operationId: Upload
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadRequest'
+            example:
+              accessCode: 418664
+              concernPoints:
+              - longitude: 23.183994
+                latitude: -72.318221
+                time: 1591747200000
+              - longitude: 23.183994
+                latitude: -72.318221
+                time: 1591747500000
+              - longitude: 23.183994
+                latitude: -72.318221
+                time: 1591747800000
+              - longitude: 23.183994
+                latitude: -72.318221
+                time: 1591748100000
+        required: true
+      responses:
+        200:
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+      deprecated: false
+  /organization/configuration:
+    get:
+      summary: Returns information about the organization
+      operationId: OrganizationConfiguration
+      parameters:
+      - name: id
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 1eb7c9ac-e417-4845-a7e3-a74db447ecc7
+      responses:
+        200:
+          description: 'Returns meta information about HA corresponding with ID passed in query params.'
+          headers: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationConfigurationResponse'
+      deprecated: false
+components:
+  schemas:
+    AccessCodeValidRequest:
+      title: AccessCodeValidRequest
+      required:
+      - accessCode
+      type: object
+      properties:
+        accessCode:
+          type: string
+      example:
+        accessCode: 272236
+    AccessCodeValidResponse:
+      title: AccessCodeValidResponse
+      properties:
+        valid:
+          type: boolean
+      example:
+        valid: true
+    ConsentRequest:
+      title: ConsentRequest
+      required:
+      - accessCode
+      - consent
+      type: object
+      properties:
+        accessCode:
+          type: string
+        consent:
+          type: boolean
+      example:
+        accessCode: 272236
+        consent: true
+    UploadRequest:
+      title: UploadRequest
+      required:
+      - accessCode
+      - concernPoints
+      type: object
+      properties:
+        accessCode:
+          type: string
+        concernPoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConcernPoint'
+      example:
+        accessCode: 418664
+        concernPoints:
+        - longitude: 23.183994
+          latitude: -72.318221
+          time: 1591747200000
+        - longitude: 23.183994
+          latitude: -72.318221
+          time: 1591747500000
+        - longitude: 23.183994
+          latitude: -72.318221
+          time: 1591747800000
+        - longitude: 23.183994
+          latitude: -72.318221
+          time: 1591748100000
+    UploadResponse:
+      title: UploadResponse
+      properties:
+        uploadId:
+          type: string
+      example:
+        uploadId: "d06daeef-69bc-4f29-8318-21d2f8fcc31d"
+    ConcernPoint:
+      title: ConcernPoint
+      required:
+      - longitude
+      - latitude
+      - time
+      type: object
+      properties:
+        longitude:
+          type: string
+        latitude:
+          type: string
+        time:
+          type: integer
+          format: int64
+      example:
+        longitude: 23.183994
+        latitude: -72.318221
+        time: 1591747200000
+    OrganizationConfigurationResponse:
+      title: OrganizationConfigurationResponse
+      properties:
+        name:
+          type: string
+        notificationThresholdPercent:
+          type: integer
+        notificationThresholdTimeframe:
+          type: integer
+        apiEndpointUrl:
+          type: string
+        referenceWebsiteUrl:
+          type: string
+        infoWebsiteUrl:
+          type: string
+        privacyPolicyUrl:
+          type: string
+        regionCoordinates:
+          type: object
+      example:
+        name: "Health Authority"
+        notificationThresholdPercent: 66
+        notificationThresholdTimeframe: 30
+        apiEndpointUrl: "https://s3.aws.com/bucket_name"
+        referenceWebsiteUrl: "https://who.int"
+        infoWebsiteUrl: "https://www.who.int/about/what-we-do"
+        privacyPolicyUrl: "https://www.who.int/about/who-we-are/privacy-policy"
+        regionCoordinates:
+          ne:
+            latitude: 21.312764055951195
+            longitude: -21.45445121262883
+          sw:
+            latitude: 21.766025040122642
+            longitude: -21.49442923997258
+        
