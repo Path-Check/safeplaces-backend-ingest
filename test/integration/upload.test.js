@@ -16,7 +16,6 @@ describe('POST /upload', () => {
     longitude: 14.91328448,
     latitude: 41.24060321,
     time: 1589117739000,
-    hash: "87e916850d4def3c",
   }];
 
   let currentAccessCode;
