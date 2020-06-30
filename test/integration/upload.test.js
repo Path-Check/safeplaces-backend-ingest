@@ -16,6 +16,7 @@ describe('POST /upload', () => {
     longitude: 14.91328448,
     latitude: 41.24060321,
     time: 1589117739000,
+    hash: "87e916850d4def3c",
   }];
 
   let currentAccessCode;
@@ -90,6 +91,7 @@ describe('POST /upload', () => {
         accessCode: currentAccessCode.value,
         concernPoints: uploadPoints,
       });
+      
     result.should.have.status(201);
     chai.should().exist(result.body.uploadId);
 
