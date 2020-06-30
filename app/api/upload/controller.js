@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const accessCodes = require('../../../db/models/accessCodes');
 const points = require('../../../db/models/points');
+const geoHash = require('../../lib/geoHash');
 
 /**
  * @method checkValid
@@ -87,8 +88,20 @@ exports.upload = async (req, res) => {
   }
 
   const uploadId = uuidv4();
+  
+  const hashedUploadedPoints = []
+  let point
+  for(point of uploadedPoints) {
+    const hash = await geoHash.encrypt(point);
+    if (hash) {
+      point.hash = hash
+      hashedUploadedPoints.push(point)
+    } else {
+      throw new Error('Could not hash point.')
+    }
+  }
 
-  await points.createMany(uploadedPoints, code, uploadId);
+  await points.createMany(hashedUploadedPoints, code, uploadId);
 
   // Access code is one-time use
   await accessCodes.invalidate(code);
