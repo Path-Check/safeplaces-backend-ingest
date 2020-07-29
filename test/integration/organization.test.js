@@ -1,5 +1,5 @@
 process.env.NODE_ENV = 'test';
-process.env.DB_NAME = (process.env.DB_NAME || 'safeplaces_ingest_test');
+process.env.DB_NAME_PUB = process.env.DB_NAME_PUB || 'safeplaces_ingest_test';
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -45,12 +45,20 @@ describe('GET /organization/configuration', () => {
     result.should.have.status(200);
     result.body.should.be.a('object');
     result.body.name.should.equal(currentOrganization.name);
-    result.body.notificationThresholdPercent.should.equal(currentOrganization.notificationThresholdPercent);
-    result.body.notificationThresholdTimeframe.should.equal(currentOrganization.notificationThresholdTimeframe);
+    result.body.notificationThresholdPercent.should.equal(
+      currentOrganization.notificationThresholdPercent,
+    );
+    result.body.notificationThresholdTimeframe.should.equal(
+      currentOrganization.notificationThresholdTimeframe,
+    );
     result.body.regionCoordinates.should.be.a('object');
     result.body.apiEndpointUrl.should.equal(currentOrganization.apiEndpointUrl);
-    result.body.referenceWebsiteUrl.should.equal(currentOrganization.referenceWebsiteUrl);
+    result.body.referenceWebsiteUrl.should.equal(
+      currentOrganization.referenceWebsiteUrl,
+    );
     result.body.infoWebsiteUrl.should.equal(currentOrganization.infoWebsiteUrl);
-    result.body.privacyPolicyUrl.should.equal(currentOrganization.privacyPolicyUrl);
+    result.body.privacyPolicyUrl.should.equal(
+      currentOrganization.privacyPolicyUrl,
+    );
   });
 });

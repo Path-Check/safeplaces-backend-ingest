@@ -1,4 +1,4 @@
-const organizations = require('../../../db/models/organizations');
+const { organizationService } = require('../../lib/db');
 
 /**
  * @method fetchOrganization
@@ -14,7 +14,7 @@ exports.fetchOrganization = async (req, res) => {
     return;
   }
 
-  const organization = await organizations.find({ external_id: id });
+  const organization = await organizationService.find({ external_id: id });
 
   if (organization == null) {
     res.status(404).send();
