@@ -1,12 +1,11 @@
 process.env.NODE_ENV = 'test';
-process.env.DB_NAME = (process.env.DB_NAME || 'safeplaces_ingest_test');
+process.env.DB_NAME_PUB = process.env.DB_NAME_PUB || 'safeplaces_ingest_test';
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mockData = require('../lib/mockData');
 const server = require('../../app');
-
-const accessCodes = require('../../db/models/accessCodes');
+const { accessCodeService } = require('../../app/lib/db');
 
 chai.use(chaiHttp);
 
@@ -23,7 +22,7 @@ describe('POST /access-code/valid', () => {
       .request(server.app)
       .post('/access-code/valid')
       .send();
-      
+
     result.should.have.status(400);
   });
 
@@ -40,7 +39,7 @@ describe('POST /access-code/valid', () => {
   });
 
   it('should succeed when code is invalid', async () => {
-    await accessCodes.invalidate(currentAccessCode);
+    await accessCodeService.invalidate(currentAccessCode);
 
     const result = await chai
       .request(server.app)
@@ -58,7 +57,7 @@ describe('POST /access-code/valid', () => {
       .request(server.app)
       .post('/access-code/valid')
       .send({
-        accessCode: "fake_code",
+        accessCode: 'fake_code',
       });
     result.should.have.status(200);
     result.body.should.have.property('valid');

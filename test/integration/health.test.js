@@ -1,5 +1,5 @@
 process.env.NODE_ENV = 'test';
-process.env.DB_NAME = (process.env.DB_NAME || 'safeplaces_ingest_test');
+process.env.DB_NAME_PUB = process.env.DB_NAME_PUB || 'safeplaces_ingest_test';
 
 var chai = require('chai');
 var should = chai.should(); // eslint-disable-line

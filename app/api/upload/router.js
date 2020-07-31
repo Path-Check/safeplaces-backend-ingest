@@ -3,21 +3,15 @@ const controller = require('./controller');
 
 server.post(
   '/access-code/valid',
-  server.wrapAsync(
-    async (req, res) => await controller.checkValid(req, res),
-  ),
+  server.wrapAsync(async (req, res) => await controller.checkValid(req, res)),
 );
 
 server.post(
   '/consent',
-  server.wrapAsync(
-    async (req, res) => await controller.consent(req, res),
-  ),
+  server.wrapAsync(async (req, res) => await controller.consent(req, res)),
 );
 
 server.post(
   '/upload',
-  server.wrapAsync(
-    async (req, res) => await controller.upload(req, res),
-  ),
+  server.wrapAsync(async (req, res) => await controller.upload(req, res)),
 );
