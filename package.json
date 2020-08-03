@@ -3,18 +3,20 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "migrate:up": "knex migrate:latest",
-    "migrate:down": "knex migrate:rollback",
+    "migrate:up": "spdl migrate:latest --scope public --env development",
+    "migrate:down": "spdl migrate:rollback --scope public --env development",
+    "seed:dev": "spdl seed:run --scope public --env development",
+    "seed:test": "spdl migrate:latest --scope public --env test",
     "start": "node ./bin/www",
     "lint": "eslint ./",
     "lint:fix": "eslint ./ --fix",
-    "pretest": "knex migrate:latest && knex seed:run --env test",
+    "pretest": "npm run migrate:up && npm run seed:test",
     "test": "nyc --reporter=html --reporter=text mocha test/**/*.* --exit",
-    "posttest": "knex seed:run --env development",
-    "test:int": "mocha test/integration/*.*",
-    "test:unit": "mocha test/unit/*.*",
-    "test:all": "mocha test/**/*.*",
-    "format": "prettier --write **/*.{js,json}"
+    "posttest": "npm run seed:dev",
+    "test:int": "mocha test/integration/*.* --exit",
+    "test:unit": "mocha test/unit/*.* --exit",
+    "test:all": "mocha test/**/*.* --exit",
+    "format": "prettier --write \"**/*.{js,json}\""
   },
   "pre-commit": [
     "format",
@@ -22,6 +24,7 @@
     "test"
   ],
   "dependencies": {
+    "@pathcheck/data-layer": "^1.0.3",
     "adm-zip": "^0.4.14",
     "atob": "^2.1.2",
     "bcrypt": "^4.0.1",
@@ -36,8 +39,6 @@
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.4.0",
-    "knex": "^0.20.15",
-    "knex-postgis": "^0.12.0",
     "morgan": "~1.9.1",
     "ngeohash": "^0.6.3",
     "passport": "^0.4.1",
@@ -45,6 +46,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.0.2",
     "response-time": "^2.3.2",
+    "uuid": "^8.3.0",
     "winston": "2.4.4",
     "winston-papertrail": "^1.0.5",
     "wkx": "^0.5.0"
