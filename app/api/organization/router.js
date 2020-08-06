@@ -1,9 +1,9 @@
-const server = require('../../../src/server');
+const { router } = require('../../../app');
 const controller = require('./controller');
 
-server.get(
+router.get(
   '/organization/configuration',
-  server.wrapAsync(
+  router.wrapAsync(
     async (req, res) => await controller.fetchOrganization(req, res),
   ),
 );
