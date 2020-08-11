@@ -4,7 +4,8 @@ process.env.DB_NAME_PUB = process.env.DB_NAME_PUB || 'safeplaces_ingest_test';
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mockData = require('../lib/mockData');
-const server = require('../../app');
+const app = require('../../app');
+const server = app.getTestingServer();
 
 const { pointService, accessCodeService } = require('../../app/lib/db');
 
@@ -27,19 +28,19 @@ describe('POST /upload', () => {
   });
 
   it('should fail when request is malformed', async () => {
-    let result = await chai.request(server.app).post('/upload').send({
+    let result = await chai.request(server).post('/upload').send({
       accessCode: currentAccessCode.value,
     });
     result.should.have.status(400);
 
-    result = await chai.request(server.app).post('/upload').send({
+    result = await chai.request(server).post('/upload').send({
       concernPoints: uploadPoints,
     });
     result.should.have.status(400);
   });
 
   it('should fail when access code does not exist', async () => {
-    const result = await chai.request(server.app).post('/upload').send({
+    const result = await chai.request(server).post('/upload').send({
       accessCode: 'fake_code',
       concernPoints: uploadPoints,
     });
@@ -48,7 +49,7 @@ describe('POST /upload', () => {
 
   it('should fail when access code is invalid', async () => {
     await accessCodeService.invalidate(currentAccessCode);
-    const result = await chai.request(server.app).post('/upload').send({
+    const result = await chai.request(server).post('/upload').send({
       accessCode: currentAccessCode.value,
       concernPoints: uploadPoints,
     });
@@ -58,7 +59,7 @@ describe('POST /upload', () => {
   it('should fail without consent', async () => {
     chai.should().not.exist(currentAccessCode.upload_consent);
 
-    const result = await chai.request(server.app).post('/upload').send({
+    const result = await chai.request(server).post('/upload').send({
       accessCode: currentAccessCode.value,
       concernPoints: uploadPoints,
     });
@@ -69,7 +70,7 @@ describe('POST /upload', () => {
     await accessCodeService.updateUploadConsent(currentAccessCode, true);
     currentAccessCode.upload_consent.should.be.true;
 
-    const result = await chai.request(server.app).post('/upload').send({
+    const result = await chai.request(server).post('/upload').send({
       accessCode: currentAccessCode.value,
       concernPoints: uploadPoints,
     });
