@@ -13,5 +13,5 @@
 
 # Breaking Changes
 
-- The `EXPRESS_PORT` environment variable is required to configure what port the express server is to run on (will default to port `3000` if it is not) 
+- The `EXPRESSPORT` environment variable is required to configure what port the express server is to run on (will default to port `3000` if it is not) 
 
