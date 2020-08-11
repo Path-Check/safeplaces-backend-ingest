@@ -1,7 +1,6 @@
 const { v4: uuidv4 } = require('uuid');
 
-const accessCodes = require('../../../db/models/accessCodes');
-const points = require('../../../db/models/points');
+const { accessCodeService, pointService } = require('../../lib/db');
 
 /**
  * @method checkValid
@@ -17,10 +16,10 @@ exports.checkValid = async (req, res) => {
     return;
   }
 
-  const code = await accessCodes.find({ value: codeValue });
+  const code = await accessCodeService.find({ value: codeValue });
 
   res.status(200).send({
-    valid: (code != null && code.valid)
+    valid: code != null && code.valid,
   });
 };
 
@@ -39,7 +38,7 @@ exports.consent = async (req, res) => {
     return;
   }
 
-  const code = await accessCodes.find({ value: codeValue });
+  const code = await accessCodeService.find({ value: codeValue });
 
   // Check validity of access code
   if (!code || !code.valid) {
@@ -47,11 +46,11 @@ exports.consent = async (req, res) => {
     return;
   }
 
-  await accessCodes.updateUploadConsent(code, consent);
+  await accessCodeService.updateUploadConsent(code, consent);
 
   // If consent isn't granted, access code can no longer be used
   if (!consent) {
-    await accessCodes.invalidate(code);
+    await accessCodeService.invalidate(code);
   }
 
   res.status(200).send();
@@ -60,7 +59,7 @@ exports.consent = async (req, res) => {
 /**
  * @method upload
  *
- * Uploads points for the case associated with provided access token.
+ * Uploads pointService for the case associated with provided access token.
  * Requires the access token to be valid.
  *
  */
@@ -72,7 +71,7 @@ exports.upload = async (req, res) => {
     return;
   }
 
-  const code = await accessCodes.find({ value: codeValue });
+  const code = await accessCodeService.find({ value: codeValue });
 
   // Check validity of access code
   if (!code || !code.valid) {
@@ -88,10 +87,10 @@ exports.upload = async (req, res) => {
 
   const uploadId = uuidv4();
 
-  await points.createMany(uploadedPoints, code, uploadId);
+  await pointService.createMany(uploadedPoints, code, uploadId);
 
   // Access code is one-time use
-  await accessCodes.invalidate(code);
+  await accessCodeService.invalidate(code);
 
   res.status(201).send({
     uploadId: uploadId,

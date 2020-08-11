@@ -1,12 +1,13 @@
 process.env.NODE_ENV = 'test';
-process.env.DB_NAME = (process.env.DB_NAME || 'safeplaces_ingest_test');
+process.env.DB_NAME_PUB = process.env.DB_NAME_PUB || 'safeplaces_ingest_test';
 
 const { v4: uuidv4 } = require('uuid');
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mockData = require('../lib/mockData');
-const server = require('../../app');
+const app = require('../../app');
+const server = app.getTestingServer();
 
 chai.use(chaiHttp);
 
@@ -21,7 +22,7 @@ describe('GET /organization/configuration', () => {
 
   it('should fail when request is malformed', async () => {
     let result = await chai
-      .request(server.app)
+      .request(server)
       .get('/organization/configuration')
       .send();
     result.should.have.status(400);
@@ -29,7 +30,7 @@ describe('GET /organization/configuration', () => {
 
   it('should fail when organization does not exist', async () => {
     const result = await chai
-      .request(server.app)
+      .request(server)
       .get('/organization/configuration')
       .query({ id: uuidv4() })
       .send();
@@ -38,19 +39,27 @@ describe('GET /organization/configuration', () => {
 
   it('should return the organization configuration', async () => {
     const result = await chai
-      .request(server.app)
+      .request(server)
       .get('/organization/configuration')
       .query({ id: externalId })
       .send();
     result.should.have.status(200);
     result.body.should.be.a('object');
     result.body.name.should.equal(currentOrganization.name);
-    result.body.notificationThresholdPercent.should.equal(currentOrganization.notificationThresholdPercent);
-    result.body.notificationThresholdTimeframe.should.equal(currentOrganization.notificationThresholdTimeframe);
+    result.body.notificationThresholdPercent.should.equal(
+      currentOrganization.notificationThresholdPercent,
+    );
+    result.body.notificationThresholdTimeframe.should.equal(
+      currentOrganization.notificationThresholdTimeframe,
+    );
     result.body.regionCoordinates.should.be.a('object');
     result.body.apiEndpointUrl.should.equal(currentOrganization.apiEndpointUrl);
-    result.body.referenceWebsiteUrl.should.equal(currentOrganization.referenceWebsiteUrl);
+    result.body.referenceWebsiteUrl.should.equal(
+      currentOrganization.referenceWebsiteUrl,
+    );
     result.body.infoWebsiteUrl.should.equal(currentOrganization.infoWebsiteUrl);
-    result.body.privacyPolicyUrl.should.equal(currentOrganization.privacyPolicyUrl);
+    result.body.privacyPolicyUrl.should.equal(
+      currentOrganization.privacyPolicyUrl,
+    );
   });
 });

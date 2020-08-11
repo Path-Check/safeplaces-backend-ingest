@@ -1,23 +1,17 @@
-const server = require('../../../src/server');
+const { router } = require('../../../app');
 const controller = require('./controller');
 
-server.post(
+router.post(
   '/access-code/valid',
-  server.wrapAsync(
-    async (req, res) => await controller.checkValid(req, res),
-  ),
+  router.wrapAsync(async (req, res) => await controller.checkValid(req, res)),
 );
 
-server.post(
+router.post(
   '/consent',
-  server.wrapAsync(
-    async (req, res) => await controller.consent(req, res),
-  ),
+  router.wrapAsync(async (req, res) => await controller.consent(req, res)),
 );
 
-server.post(
+router.post(
   '/upload',
-  server.wrapAsync(
-    async (req, res) => await controller.upload(req, res),
-  ),
+  router.wrapAsync(async (req, res) => await controller.upload(req, res)),
 );
