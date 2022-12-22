@@ -25,7 +25,7 @@
   ],
   "dependencies": {
     "@pathcheck/data-layer": "^1.0.3",
-    "@pathcheck/safeplaces-server": "0.0.9",
+    "@pathcheck/safeplaces-server": "0.0.14",
     "debug": "~2.6.9",
     "pg": "^8.0.2",
     "uuid": "^8.3.0"
